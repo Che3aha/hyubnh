@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Alphabet Zoo — Learn Your Letters!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FFF8E9;
+    --cream-deep: #FFEFCB;
+    --ink: #3A2E52;
+    --coral: #FF6F5E;
+    --coral-dark: #E85445;
+    --turquoise: #23B5A8;
+    --turquoise-dark: #178E84;
+    --sun: #FFC145;
+    --sun-dark: #F0A500;
+    --grass: #6FCF97;
+    --grass-dark: #4CAF77;
+    --grape: #9B72CF;
+    --grape-dark: #7E51B8;
+    --sky: #4FB4E8;
+    --sky-dark: #2E96CC;
+    --white: #FFFFFF;
+    --shadow: rgba(58, 46, 82, 0.18);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0; padding:0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+
+  .app{
+    min-height: 100vh;
+    padding: 20px 16px 48px;
+    position: relative;
+  }
+
+  /* ---------- decorative rainbow arch ---------- */
+  .arch-wrap{
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto 8px;
+    height: 78px;
+    overflow: visible;
+  }
+  .arch-wrap svg{ display:block; width: 100%; height: auto; }
+
+  /* ---------- header ---------- */
+  header{
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 18px;
+    position: relative;
+  }
+  .mascot{
+    font-size: 54px;
+    display: inline-block;
+    animation: bob 2.6s ease-in-out infinite;
+    filter: drop-shadow(0 6px 8px var(--shadow));
+  }
+  @keyframes bob{
+    0%,100%{ transform: translateY(0) rotate(-3deg); }
+    50%{ transform: translateY(-8px) rotate(3deg); }
+  }
+  h1{
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 7vw, 48px);
+    margin: 6px 0 2px;
+    color: var(--coral-dark);
+    letter-spacing: 0.5px;
+  }
+  h1 span{ color: var(--turquoise-dark); }
+  .subtitle{
+    font-weight: 700;
+    font-size: clamp(15px, 3vw, 18px);
+    color: var(--ink);
+    opacity: 0.75;
+    margin: 0;
+  }
+
+  /* ---------- progress bar ---------- */
+  .progress-wrap{
+    display: none;
+  }
+  .progress-wrap.active{
+    max-width: 480px;
+    margin: 16px auto 26px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--white);
+    border-radius: 999px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 0 var(--shadow);
+  }
+  .progress-label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--grape-dark);
+    white-space: nowrap;
+  }
+  .progress-track{
+    flex: 1;
+    height: 14px;
+    background: var(--cream-deep);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill{
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--grass), var(--turquoise));
+    border-radius: 999px;
+    transition: width 0.5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .progress-count{
+    font-family:'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--coral-dark);
+    min-width: 46px;
+    text-align: right;
+  }
+
+  /* ---------- mode toggle ---------- */
+  .mode-toggle{
+    max-width: 320px;
+    margin: 0 auto 16px;
+    display: flex;
+    gap: 8px;
+    background: var(--white);
+    padding: 6px;
+    border-radius: 999px;
+    box-shadow: 0 4px 0 var(--shadow);
+  }
+  .mode-btn{
+    all: unset;
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    color: var(--ink);
+    opacity: 0.55;
+  }
+  .mode-btn.active{
+    opacity: 1;
+    color: var(--white);
+    background: linear-gradient(160deg, var(--grape), var(--grape-dark));
+  }
+  .mode-btn:focus-visible{ outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* ---------- quiz bar ---------- */
+  .quiz-bar{
+    display: none;
+    max-width: 480px;
+    margin: 0 auto 26px;
+    background: var(--white);
+    border-radius: 20px;
+    padding: 14px 18px;
+    box-shadow: 0 4px 0 var(--shadow);
+    text-align: center;
+  }
+  .quiz-bar.active{ display: block; }
+  .quiz-prompt{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .quiz-prompt-text{
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: clamp(17px, 4vw, 20px);
+    color: var(--coral-dark);
+  }
+  .quiz-score{
+    display: block;
+    margin-top: 6px;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--turquoise-dark);
+  }
+
+  .tile.correct button .face.front{
+    animation: correctPulse 0.6s ease;
+  }
+  @keyframes correctPulse{
+    0%{ box-shadow: 0 0 0 0 rgba(111,207,151,0.7); }
+    100%{ box-shadow: 0 0 0 14px rgba(111,207,151,0); }
+  }
+  .tile.wrong button{
+    animation: shake 0.4s ease;
+  }
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-6px); }
+    75%{ transform: translateX(6px); }
+  }
+  body.quiz-mode .face.front .peek{ display: none; }
+  body.quiz-mode .tile.explored .face.front::after{ content: none; }
+
+  /* ---------- grid ---------- */
+  .grid{
+    max-width: 780px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 12px;
+  }
+
+  .tile{
+    perspective: 800px;
+    aspect-ratio: 1 / 1;
+  }
+  .tile button{
+    all: unset;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(.34,1.56,.64,1);
+    border-radius: 18px;
+  }
+  .tile.flipped button{ transform: rotateY(180deg); }
+
+  .face{
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.14), 0 6px 10px var(--shadow);
+  }
+  .face.front{
+    color: var(--white);
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: clamp(28px, 5vw, 36px);
+  }
+  .face.front .peek{
+    position: absolute;
+    bottom: 4px;
+    right: 6px;
+    font-size: 15px;
+    opacity: 0.85;
+  }
+  .face.back{
+    background: var(--white);
+    transform: rotateY(180deg);
+    padding: 4px;
+  }
+  .face.back .emoji{ font-size: clamp(24px, 4.5vw, 30px); line-height:1; }
+  .face.back .word{
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: clamp(9px, 1.8vw, 11px);
+    color: var(--ink);
+    margin-top: 2px;
+    text-align: center;
+    padding: 0 2px;
+  }
+
+  .tile button:focus-visible .face.front{
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  .tile.explored .face.front::after{
+    content: "★";
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .tile button:active{ transform: scale(0.94); }
+  .tile.flipped button:active{ transform: rotateY(180deg) scale(0.94); }
+
+  /* palette rotation via nth-child */
+  .p0 .face.front{ background: linear-gradient(160deg, var(--coral), var(--coral-dark)); }
+  .p1 .face.front{ background: linear-gradient(160deg, var(--turquoise), var(--turquoise-dark)); }
+  .p2 .face.front{ background: linear-gradient(160deg, var(--sun), var(--sun-dark)); }
+  .p3 .face.front{ background: linear-gradient(160deg, var(--grass), var(--grass-dark)); }
+  .p4 .face.front{ background: linear-gradient(160deg, var(--grape), var(--grape-dark)); }
+  .p5 .face.front{ background: linear-gradient(160deg, var(--sky), var(--sky-dark)); }
+
+  /* ---------- replay button ---------- */
+  .replay-btn{
+    all: unset;
+    cursor: pointer;
+    margin-top: 3px;
+    font-size: 15px;
+    line-height: 1;
+    padding: 3px 6px;
+    border-radius: 999px;
+    background: var(--cream-deep);
+  }
+  .replay-btn:focus-visible{ outline: 2px solid var(--ink); }
+
+  /* ---------- celebration ---------- */
+  .celebration{
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(58,46,82,0.55);
+    z-index: 50;
+    padding: 20px;
+  }
+  .celebration.show{ display: flex; }
+  .celebration-card{
+    background: var(--white);
+    border-radius: 28px;
+    padding: 36px 28px;
+    text-align: center;
+    max-width: 360px;
+    box-shadow: 0 10px 0 var(--shadow);
+  }
+  .celebration-card .big-emoji{
+    font-size: 56px;
+    display: block;
+    margin-bottom: 10px;
+    animation: bob 1.4s ease-in-out infinite;
+  }
+  .celebration-card h2{
+    font-family: 'Baloo 2', sans-serif;
+    color: var(--coral-dark);
+    margin: 0 0 8px;
+    font-size: 26px;
+  }
+  .celebration-card p{
+    margin: 0 0 18px;
+    font-weight: 700;
+    opacity: 0.8;
+  }
+  .celebration-card button{
+    all: unset;
+    cursor: pointer;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    color: var(--white);
+    background: linear-gradient(160deg, var(--turquoise), var(--turquoise-dark));
+    padding: 12px 26px;
+    border-radius: 999px;
+    box-shadow: 0 4px 0 var(--turquoise-dark);
+  }
+
+  footer{
+    text-align: center;
+    max-width: 720px;
+    margin: 30px auto 0;
+    font-size: 13px;
+    opacity: 0.55;
+    font-weight: 700;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .mascot{ animation: none; }
+    .tile button{ transition: none; }
+    .celebration-card .big-emoji{ animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="arch-wrap" aria-hidden="true">
+    <svg viewBox="0 0 720 90" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 90 A340 340 0 0 1 700 90" fill="none" stroke="#FF6F5E" stroke-width="10" stroke-linecap="round"/>
+      <path d="M40 90 A320 320 0 0 1 680 90" fill="none" stroke="#FFC145" stroke-width="10" stroke-linecap="round"/>
+      <path d="M60 90 A300 300 0 0 1 660 90" fill="none" stroke="#6FCF97" stroke-width="10" stroke-linecap="round"/>
+      <path d="M80 90 A280 280 0 0 1 640 90" fill="none" stroke="#4FB4E8" stroke-width="10" stroke-linecap="round"/>
+      <path d="M100 90 A260 260 0 0 1 620 90" fill="none" stroke="#9B72CF" stroke-width="10" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <header>
+    <span class="mascot" aria-hidden="true">🦁</span>
+    <h1>Alphabet <span>Zoo</span></h1>
+    <p class="subtitle">Tap a letter to meet its animal friend!</p>
+  </header>
+
+  <div class="mode-toggle" role="group" aria-label="Game mode">
+    <button type="button" id="exploreModeBtn" class="mode-btn active">🔍 Explore</button>
+    <button type="button" id="quizModeBtn" class="mode-btn">🎯 Quiz</button>
+  </div>
+
+  <div class="progress-wrap active" id="exploreBar" role="status" aria-live="polite">
+    <span class="progress-label">My letters</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-count" id="progressCount">0/26</span>
+  </div>
+
+  <div class="quiz-bar" id="quizBar" role="status" aria-live="polite">
+    <div class="quiz-prompt">
+      <span class="quiz-prompt-text" id="quizPromptText">Find the letter A!</span>
+      <button type="button" class="replay-btn quiz-replay" id="quizReplayBtn" aria-label="Hear the question again">🔊</button>
+    </div>
+    <span class="quiz-score" id="quizScoreText">Score: 0/26</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>Made for curious 5-year-olds 🐾</footer>
+</div>
+
+<div class="celebration" id="celebration">
+  <div class="celebration-card">
+    <span class="big-emoji">🎉</span>
+    <h2 id="celebrationTitle">You met the whole zoo!</h2>
+    <p id="celebrationText">All 26 letters explored. Amazing job!</p>
+    <button id="celebrationClose">Play again</button>
+  </div>
+</div>
+
+<script>
+const animals = [
+  {l:"A", word:"Alligator", emoji:"🐊"},
+  {l:"B", word:"Bear", emoji:"🐻"},
+  {l:"C", word:"Cat", emoji:"🐱"},
+  {l:"D", word:"Dog", emoji:"🐶"},
+  {l:"E", word:"Elephant", emoji:"🐘"},
+  {l:"F", word:"Fox", emoji:"🦊"},
+  {l:"G", word:"Giraffe", emoji:"🦒"},
+  {l:"H", word:"Hippo", emoji:"🦛"},
+  {l:"I", word:"Iguana", emoji:"🦎"},
+  {l:"J", word:"Jellyfish", emoji:"🪼"},
+  {l:"K", word:"Koala", emoji:"🐨"},
+  {l:"L", word:"Lion", emoji:"🦁"},
+  {l:"M", word:"Monkey", emoji:"🐵"},
+  {l:"N", word:"Nightingale", emoji:"🐦"},
+  {l:"O", word:"Owl", emoji:"🦉"},
+  {l:"P", word:"Penguin", emoji:"🐧"},
+  {l:"Q", word:"Quokka", emoji:"🐹"},
+  {l:"R", word:"Rabbit", emoji:"🐰"},
+  {l:"S", word:"Snake", emoji:"🐍"},
+  {l:"T", word:"Tiger", emoji:"🐯"},
+  {l:"U", word:"Unicorn", emoji:"🦄"},
+  {l:"V", word:"Vulture", emoji:"🦅"},
+  {l:"W", word:"Wolf", emoji:"🐺"},
+  {l:"X", word:"X-ray Fish", emoji:"🐠"},
+  {l:"Y", word:"Yak", emoji:"🦬"},
+  {l:"Z", word:"Zebra", emoji:"🦓"}
+];
+
+const grid = document.getElementById('grid');
+const progressFill = document.getElementById('progressFill');
+const progressCount = document.getElementById('progressCount');
+const celebration = document.getElementById('celebration');
+const celebrationTitle = document.getElementById('celebrationTitle');
+const celebrationText = document.getElementById('celebrationText');
+const exploredSet = new Set();
+const tileRefs = {};
+
+let mode = 'explore';
+let quizQueue = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizLocked = false;
+
+const exploreBtn = document.getElementById('exploreModeBtn');
+const quizBtn = document.getElementById('quizModeBtn');
+const exploreBar = document.getElementById('exploreBar');
+const quizBar = document.getElementById('quizBar');
+const quizPromptText = document.getElementById('quizPromptText');
+const quizScoreText = document.getElementById('quizScoreText');
+const quizReplayBtn = document.getElementById('quizReplayBtn');
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.85;
+  utter.pitch = 1.15;
+  window.speechSynthesis.speak(utter);
+}
+
+function updateProgress(){
+  const n = exploredSet.size;
+  progressFill.style.width = (n/26*100) + '%';
+  progressCount.textContent = `${n}/26`;
+  if(n === 26){
+    setTimeout(()=> celebration.classList.add('show'), 400);
+  }
+}
+
+animals.forEach((a, i) => {
+  const tile = document.createElement('div');
+  tile.className = `tile p${i % 6}`;
+
+  const btn = document.createElement('button');
+  btn.setAttribute('aria-label', `Letter ${a.l}, for ${a.word}`);
+
+  const front = document.createElement('div');
+  front.className = 'face front';
+  front.innerHTML = `${a.l}<span class="peek">${a.emoji}</span>`;
+
+  const back = document.createElement('div');
+  back.className = 'face back';
+  back.innerHTML = `
+    <div class="emoji">${a.emoji}</div>
+    <div class="word">${a.l} is for ${a.word}</div>
+    <button type="button" class="replay-btn" aria-label="Hear ${a.word} again">🔊</button>
+  `;
+
+  btn.appendChild(front);
+  btn.appendChild(back);
+  tile.appendChild(btn);
+  grid.appendChild(tile);
+
+  btn.addEventListener('click', (e) => {
+    if(mode === 'quiz'){
+      handleQuizAnswer(a, tile);
+      return;
+    }
+    if(e.target.closest('.replay-btn')){
+      speak(`${a.l} is for ${a.word}`);
+      return;
+    }
+    const willFlip = !tile.classList.contains('flipped');
+    tile.classList.toggle('flipped');
+    if(willFlip){
+      speak(`${a.l} is for ${a.word}`);
+      if(!exploredSet.has(a.l)){
+        exploredSet.add(a.l);
+        tile.classList.add('explored');
+        updateProgress();
+      }
+    }
+  });
+
+  tileRefs[a.l] = { tile, btn, data: a };
+});
+
+function shuffledLetters(){
+  const arr = animals.map(a => a.l);
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function resetAllTiles(){
+  Object.values(tileRefs).forEach(({tile}) => {
+    tile.classList.remove('flipped', 'correct', 'wrong');
+  });
+}
+
+function askQuizQuestion(){
+  quizLocked = false;
+  const letter = quizQueue[quizIndex];
+  quizPromptText.textContent = `Find the letter ${letter}!`;
+  quizScoreText.textContent = `Score: ${quizScore}/26`;
+  speak(`Find the letter ${letter}`);
+}
+
+function handleQuizAnswer(a, tile){
+  if(quizLocked) return;
+  const target = quizQueue[quizIndex];
+  if(a.l === target){
+    quizLocked = true;
+    quizScore++;
+    tile.classList.add('flipped', 'correct');
+    speak(`Yes! ${a.l} is for ${a.word}`);
+    quizIndex++;
+    setTimeout(() => {
+      tile.classList.remove('flipped', 'correct');
+      if(quizIndex >= quizQueue.length){
+        finishQuiz();
+      } else {
+        askQuizQuestion();
+      }
+    }, 1400);
+  } else {
+    tile.classList.add('wrong');
+    speak('Try again!');
+    setTimeout(() => tile.classList.remove('wrong'), 400);
+  }
+}
+
+function finishQuiz(){
+  quizScoreText.textContent = `Score: ${quizScore}/26`;
+  celebrationTitle.textContent = 'Quiz complete!';
+  celebrationText.textContent = `You found ${quizScore} out of 26 letters. Great job!`;
+  celebration.classList.add('show');
+}
+
+function startQuiz(){
+  resetAllTiles();
+  quizQueue = shuffledLetters();
+  quizIndex = 0;
+  quizScore = 0;
+  askQuizQuestion();
+}
+
+function setMode(newMode){
+  mode = newMode;
+  resetAllTiles();
+  document.body.classList.toggle('quiz-mode', mode === 'quiz');
+  exploreBtn.classList.toggle('active', mode === 'explore');
+  quizBtn.classList.toggle('active', mode === 'quiz');
+  exploreBar.classList.toggle('active', mode === 'explore');
+  quizBar.classList.toggle('active', mode === 'quiz');
+  if(mode === 'quiz'){
+    startQuiz();
+  }
+}
+
+exploreBtn.addEventListener('click', () => setMode('explore'));
+quizBtn.addEventListener('click', () => setMode('quiz'));
+quizReplayBtn.addEventListener('click', () => {
+  const letter = quizQueue[quizIndex];
+  if(letter) speak(`Find the letter ${letter}`);
+});
+
+document.getElementById('celebrationClose').addEventListener('click', () => {
+  celebration.classList.remove('show');
+  if(mode === 'quiz'){
+    startQuiz();
+  }
+});
+</script>
+</body>
+</html>
